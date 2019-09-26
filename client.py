@@ -16,9 +16,8 @@ for i in range(fileNumber):
 for name in filename:
     seq_number = 1
     namesplit = name.split(".")
-    f = open(name, "rb")
-    
-    data = f.read(100)
+    f = open(name, "rb")  
+    data = f.read(32768)
     while data:
         if(seq_number == 1):
             Data = packet("DATA", ID, seq_number, namesplit[0].encode())
@@ -28,14 +27,14 @@ for name in filename:
             Data = packet("DATA", ID, seq_number, data)
             packetList.append(Data)
             seq_number+=1
-            data=f.read(100)
-        
+            data=f.read(32768)      
     ID += 1
 print("panjang"+str(len(packetList)))
 for i in range(len(packetList)):
     if(i==len(packetList)-1):
         packetList[i].setType("FIN")
     sock.sendto(packetList[i].getPacketArray(),(UDP_IP,IN_PORT))
-    
-
-    
+    rec=sock.recvfrom(32776)
+    if(rec[0][0]==0x3):
+        print("masuk")
+        break
