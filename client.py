@@ -17,9 +17,9 @@ data=f.read(100)
 while data:
     sendData=packet("DATA",0,seq_number,data)
     datalist=sendData.convertToArray()
-    print(datalist)
     sock.sendto(datalist,(Address[0],int(Address[1])))
     ackValidation=sock.recvfrom(1024)
     print(ackValidation[0].decode())
     data=f.read(100)
+    seq_number+=1
 f.close()

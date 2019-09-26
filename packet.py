@@ -25,8 +25,8 @@ class packet:
 
         for b in self.DATA:
             packetArray[i]=b
-            i=+1
-            print(b.to_bytes())
+            i+=1
+            
 
-        print(i)
+        
         return packetArray
