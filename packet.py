@@ -1,32 +1,53 @@
 class packet:
     def __init__(self, TYPE, ID, SEQ_NUMBER, DATA):
+        self.packetArray=bytearray(100+8)
         if(TYPE=="DATA"):
-            self.packetType=0x0
+            self.packetArray[0]=0x0 &255
         elif(TYPE=="ACK"):
-            self.packetType=0x1
+            self.packetArray[0]=0x1&255
         elif(TYPE=="FIN-ACK"):
-            self.packetType=0x2
+            self.packetArray[0]=0x2&255
         elif(TYPE=="FIN"):
-            self.packetType=0x3
-        self.ID = ID
-        self.SEQ_NUMBER = SEQ_NUMBER
-        self.LENGTH = len(DATA)
-        self.DATA = DATA
-
-    def convertToArray(self):
-        packetArray=bytearray(100+8)
-        packetArray[0]=self.packetType &255
-        packetArray[1]=self.ID &255
-        packetArray[2]=self.SEQ_NUMBER&255
-        packetArray[3]=self.SEQ_NUMBER>>8&255
-        packetArray[4]=self.LENGTH &255
-        packetArray[5]=self.LENGTH>>8&255
+            self.packetArray[0]=0x3&255        
+        LENGTH = len(DATA)
+        
+        self.packetArray[1]=ID &255
+        self.packetArray[2]=SEQ_NUMBER&255
+        self.packetArray[3]=SEQ_NUMBER>>8&255
+        self.packetArray[4]=LENGTH &255
+        self.packetArray[5]=LENGTH>>8&255
         i=8
-
-        for b in self.DATA:
-            packetArray[i]=b
-            i+=1
+        self.packetArray[6]=0
+        self.packetArray[7]=0
             
 
-        
-        return packetArray
+        for b in DATA:
+            self.packetArray[i]=b
+            if(i%2==0):
+                self.packetArray[6]^=b
+            else:
+                self.packetArray[7]^=b
+            i+=1
+        self.packetArray[6]^=(self.packetArray[0]^self.packetArray[2] ^self.packetArray[4])
+        self.packetArray[7]^=(self.packetArray[1]^self.packetArray[3] ^self.packetArray[5])
+
+    def getPacketArray(self):
+        return self.packetArray
+    def getType(self):
+        return self.packetArray[0]
+    def getID(self):
+        return self.packetArray[1]
+    def getSeqNumber(self):
+        return ((self.packetArray[3]<<8)+self.packetArray[2])
+    def getLength(self):
+        return ((self.packetArray[5]<<8)+self.packetArray[4])
+    def setType(self,TYPE):
+        if(TYPE=="DATA"):
+            self.packetArray[0]=0x0 &255
+        elif(TYPE=="ACK"):
+            self.packetArray[0]=0x1&255
+        elif(TYPE=="FIN"):
+            self.packetArray[0]=0x2&255
+        elif(TYPE=="FIN-ACK"):
+            self.packetArray[0]=0x3&255   
+
