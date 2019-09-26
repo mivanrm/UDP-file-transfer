@@ -14,7 +14,7 @@ class packet:
         self.DATA = DATA
 
     def convertToArray(self):
-        packetArray=bytearray(200+8)
+        packetArray=bytearray(100+8)
         packetArray[0]=self.packetType &255
         packetArray[1]=self.ID &255
         packetArray[2]=self.SEQ_NUMBER&255
